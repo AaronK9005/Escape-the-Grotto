@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-int snprintf(const void*, size_t, const char*, ...);
+int snprintf(char*, size_t, const char*, ...);
 
  int floor_init_test_grid(Floor_t* f) {
     if (!f) return 1;

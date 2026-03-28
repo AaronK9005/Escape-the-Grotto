@@ -189,7 +189,7 @@ void render() {
     case GAMESTATE_INVENTORY: {
         ansi_goto_home();
         inventory_print(game_data.player.inventory, cursor_idx);
-        { // print index
+        { // print cursor slot
             putchar('\n'); putchar('\n');
             ansi_red();
             slot_print(&cursor_slot);

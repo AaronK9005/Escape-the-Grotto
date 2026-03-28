@@ -113,7 +113,10 @@ void container_print(Container_t* cont, int cols, int selected_index) {
         if (i == selected_index) printf("\033[94m");
         printf("(%s: %d) ", item_names[cont->slot[i].stack.id], cont->slot[i].stack.count);
         if (i == selected_index) printf("\033[0m");
-        if ((i + 1) % cols == 0) putchar('\n');
+        if ((i + 1) % cols == 0) {
+            printf("\x1b[0K"); // clear to endl
+            putchar('\n');
+        }
     }
 }
 
