@@ -1,0 +1,6 @@
+// M(NAME, string, SIZE, hp, defence, magic_defence)
+//M(NAME,       string,         SIZE,       hp,     defence, magic_defence)
+M(GOBLIIN,      "goblin",       SMALL,      10,     0,      0)
+M(KOBOLD,       "kobold",       SMALL,      10,     0,      0)
+M(GNOLL,        "gnoll",        MEDIUM,     10,     0,      0)
+M(GIANT_RAT,    "giant_rat",    SMALL,      10,     0,      0)
