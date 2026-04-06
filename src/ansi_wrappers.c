@@ -1,6 +1,7 @@
 #include "sys/util/ansi_wrappers.h"
 
 int printf(const char*, ...);
+int putchar(int);
 
 void ansi_up(int n) { printf("\x1b[%dA", n); }
 void ansi_down(int n)  { printf("\x1b[%dB", n); }

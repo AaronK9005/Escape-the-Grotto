@@ -14,7 +14,7 @@ typedef struct Tile_definition_t {
 } Tile_def_t;
 
 typedef enum tile_identificator_t {
-    #define T(name) TILE_##name,
+    #define T(NAME,      walk, opaque, interact) TILE_##NAME,
     #include "tiles.def"
     #undef T
 
@@ -24,3 +24,7 @@ typedef enum tile_identificator_t {
 typedef unsigned char Tile_type_t;
 
 extern /* const */ Tile_def_t tile_defs[TILE_COUNT];
+
+// extern const char tile_walkable[TILE_COUNT];
+// extern const char tile_opaque[TILE_COUNT];
+// extern const char tile_interactable[TILE_COUNT];

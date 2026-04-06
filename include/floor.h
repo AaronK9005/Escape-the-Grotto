@@ -22,12 +22,6 @@ typedef struct Floor_t {
        char lin_map[MAP_SIZE * MAP_SIZE];
        char map[MAP_SIZE][MAP_SIZE];
    };
-   /* // leave out the visibility stuff for now
-   union {
-       char lin_vis[MAP_SIZE * MAP_SIZE];
-       char map[MAP_SIZE][MAP_SIZE];
-   };
-   */
 
    // dynamic data
    Mvec_t monsters;
