@@ -135,6 +135,33 @@ int renderer_draw_rect(Renderer_t* r, char* data, int width, int height) {
     return 0;
 }
 
+int renderer_draw_tile_rect(Renderer_t* r, char* data, int width, int height) {
+    if (!r || !r->cam || !r->buffer) return 1;
+
+    for (int y = 0; y < r->cam->height; y++) {
+        for (int x = 0; x < r->cam->width; x++) {
+            int pos_x = x + r->cam->position.x;
+            int pos_y = y + r->cam->position.y;
+            if
+            (
+                pos_x >= width ||
+                pos_x < 0 ||
+                pos_y >= height ||
+                pos_y < 0
+            )
+            {
+                r->buffer[y * r->buffer_width + x] = CAM_FALLBACK_CHAR;
+            }
+            else
+            {
+                r->buffer[y * r->buffer_width + x] = tile_char[data[pos_y * width + pos_x]];
+            }
+        }
+    }
+
+    return 0;
+}
+
 int renderer_draw_char(Renderer_t* r, char c, int x, int y) {
     if (!r || !r->cam || !r->buffer) return 1;
 
@@ -152,5 +179,5 @@ int renderer_draw_char(Renderer_t* r, char c, int x, int y) {
 int render_floor(Renderer_t* r, Floor_t* f) {
     if (!f) return 1;
 
-    return renderer_draw_rect(r, f->lin_map, MAP_SIZE, MAP_SIZE);
+    return renderer_draw_tile_rect(r, f->lin_map, MAP_SIZE, MAP_SIZE);
 }

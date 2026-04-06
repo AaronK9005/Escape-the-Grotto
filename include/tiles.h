@@ -4,12 +4,13 @@
 #define TILE_OPAQUE             (1 << 1)
 #define TILE_INTERACTABLE       (1 << 2)
 
+typedef union {
+    char state[4];
+    char glyph;
+} Tile_states_t;
+
 typedef struct Tile_definition_t {
-    union
-    {
-        char glyph;
-        char state[4];
-    };
+    Tile_states_t;
     int flags;
 } Tile_def_t;
 
@@ -21,10 +22,9 @@ typedef enum tile_identificator_t {
     TILE_COUNT
 } Tile_id_t;
 
-typedef unsigned char Tile_type_t;
+typedef char Tile_type_t; // for representation in floor
 
-extern /* const */ Tile_def_t tile_defs[TILE_COUNT];
+extern const char   tile_char[TILE_COUNT];
+extern const int    tile_flags[TILE_COUNT];
 
-// extern const char tile_walkable[TILE_COUNT];
-// extern const char tile_opaque[TILE_COUNT];
-// extern const char tile_interactable[TILE_COUNT];
+Tile_def_t get_tile_def(Tile_id_t id);

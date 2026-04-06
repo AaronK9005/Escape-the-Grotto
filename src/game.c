@@ -11,20 +11,16 @@ void init_game(Game_t* game) {
 
     game->game_state = GAMESTATE_PLAYING;
     game->flags = GF_default;
-    //game->game->cursor_slot = SLOT_EMPTY;
-    //game->game->cursor_idx = 0;
-    //game->input_char = 0;
-    game->player_cam = (Camera_t){ {1,1}, DEFAULT_VISIBILITY, DEFAULT_VISIBILITY };
-    //game->renderer = EMPTY_RENDERER;
-    //game->player = (Player_t){ 0 };
-    //game->current_floor = 0;
-    // clearing floors
+    game->player_cam = //(Camera_t) { {1,1}, 32, 64}; // test camera
+                    (Camera_t){ {1,1}, DEFAULT_VISIBILITY, 2 * DEFAULT_VISIBILITY };
+    game->debug_cam = (Camera_t) { {1,1}, 32, 64};
+    // other fields are 0
 
     init_renderer(&game->renderer, &game->player_cam);
     init_player(&game->player, "Test player name");
 
     // test
-    floor_init_test_grid(&CURRENT_FLOOR(game));
+    floor_generate_grid_v1(&CURRENT_FLOOR(game));
     inventory_random_fill(game->player.inventory, 3, 7);
 }
 
@@ -67,36 +63,54 @@ void game_get_input(Game_t* game) {
 }
 
 #pragma region separate handle_input_STATE functions
+
 void handle_input_PLAYING(Game_t* game) {
     switch (game->input_char) {
         case INPUT_NONE: break;
         case INPUT_QUIT_PROGRAM: game->flags |= GF_shouldClose; break;
         case INPUT_MOVE_UP:
-            if (game->player.pos.y > 0) {
+            if ((game->player.pos.y > 0) && PLAYER_CAN_WALK(game, 0, -1)) {
                 game->player.pos.y--;
                 game->flags |= GF_render;
             }
             break;
         case INPUT_MOVE_DOWN:
-            if (game->player.pos.y < MAP_SIZE - 1) {
+            if ((game->player.pos.y < MAP_SIZE - 1) && PLAYER_CAN_WALK(game, 0, 1)) {
                 game->player.pos.y++;
                 game->flags |= GF_render;
             }
             break;
         case INPUT_MOVE_LEFT:
-            if (game->player.pos.x > 0) {
+            if ((game->player.pos.x > 0) && PLAYER_CAN_WALK(game, -1, 0)) {
                 game->player.pos.x--;
                 game->flags |= GF_render;
             }
             break;
         case INPUT_MOVE_RIGHT:
-            if (game->player.pos.x < MAP_SIZE - 1) {
+            if ((game->player.pos.x < MAP_SIZE - 1) && PLAYER_CAN_WALK(game, 1, 0)) {
                 game->player.pos.x++;
                 game->flags |= GF_render;
             }
             break;
         case INPUT_TOGGLE_INVENTORY:
             game->game_state = GAMESTATE_INVENTORY;
+            ansi_clear_screen();
+            game->flags |= GF_render;
+            break;
+        case 't':
+            game->flags ^= GF_using_debug_cam;
+            if (game->flags & GF_using_debug_cam) {
+                if (renderer_change_cam(&game->renderer, &game->debug_cam) != 0)
+                    ansi_bg_red();
+                else
+                    ansi_reset();
+            }
+            else {
+                if (renderer_change_cam(&game->renderer, &game->player_cam) != 0)
+                    ansi_bg_blue();
+                else
+                    ansi_reset();
+            }
             ansi_clear_screen();
             game->flags |= GF_render;
             break;
@@ -206,20 +220,24 @@ void render_game(Game_t* game) {
         {
         renderer_clear(&game->renderer);
 
+        Camera_t* used_cam = (game->flags & GF_using_debug_cam) ? &game->debug_cam : &game->player_cam;
+
         { // update camera position
             svec2 ncpos = { // new camera position
-                game->player.pos.x - game->player_cam.width / 2,
-                game->player.pos.y - game->player_cam.height / 2
+                game->player.pos.x - used_cam->width / 2,
+                game->player.pos.y - used_cam->height / 2
             };
 
-            game->player_cam.position.x = (short)iclamp(ncpos.x, 0, imax(MAP_SIZE - (game->player_cam.width), 0));
-            game->player_cam.position.y = (short)iclamp(ncpos.y, 0, imax(MAP_SIZE - (game->player_cam.height), 0));
+            used_cam->position.x = (short)iclamp(ncpos.x, 0, imax(MAP_SIZE - (used_cam->width), 0));
+            used_cam->position.y = (short)iclamp(ncpos.y, 0, imax(MAP_SIZE - (used_cam->height), 0));
         }
         render_floor(&game->renderer, &CURRENT_FLOOR(game));
+
         renderer_draw_char_pos(&game->renderer, PLAYER_CHAR, game->player.pos);
 
         renderer_display(&game->renderer);
         printf("\n\nPlayer.pos = (%d, %d)     \n", game->player.pos.x, game->player.pos.y);
+        printf("Using camera: %s      \n", (game->flags & GF_using_debug_cam) ? "debug" : "player");
         break;
         }
     case GAMESTATE_INVENTORY:

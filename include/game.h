@@ -16,6 +16,7 @@ typedef enum {
 typedef enum Game_flags_t {
     GF_shouldClose = FLAG(1),
     GF_render = FLAG(2),
+    GF_using_debug_cam = FLAG(3),
 
     GF_default = GF_render
 } Game_flags_t;
@@ -31,6 +32,7 @@ typedef struct Game_t {
 
     // graphics
     Camera_t player_cam;
+    Camera_t debug_cam;
     Renderer_t renderer;
 
     // game_data
@@ -41,7 +43,9 @@ typedef struct Game_t {
 //int main() { sizeof(Game_t); }
 
 #define CURRENT_FLOOR(g) ((g)->floors[(g)->current_floor])
+#define PLAYER(g) ((g)->player)
 #define PLAYER_INV(g) ((g)->player.inventory->cont->slot)
+#define PLAYER_CAN_WALK(g, dx, dy) (is_walkable(&CURRENT_FLOOR(g), PLAYER(g).pos.x + (dx), PLAYER(g).pos.y + (dy)))
 
 static inline int should_render(Game_t* game) {
     return game && (game->flags & GF_render) != 0;

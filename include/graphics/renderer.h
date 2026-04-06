@@ -4,7 +4,7 @@
 
 #include "sys/math/vec2.h"
 
-#define DEFAULT_VISIBILITY 20
+#define DEFAULT_VISIBILITY 10
 
 typedef struct Camera_t {
     svec2 position;
@@ -14,7 +14,7 @@ typedef struct Camera_t {
 #define CAM_FALLBACK_CHAR ' '
 
 /**
- * Right now just simple buffer based on camera, which can render section of data from test_data buffer
+ * Smple buffer based on camera (malloc'ed same size), which can render rectangle of data (char or glyph from tile type)
  */
 
 typedef struct Renderer_t {

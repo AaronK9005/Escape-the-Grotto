@@ -13,20 +13,25 @@
  */
 
 #include "sys/data_structs/monster_vector.h"
+#include "tiles.h"
 
 #define MAP_SIZE 64
 
 typedef struct Floor_t {
    // static data
    union {
-       char lin_map[MAP_SIZE * MAP_SIZE];
-       char map[MAP_SIZE][MAP_SIZE];
+       Tile_type_t lin_map[MAP_SIZE * MAP_SIZE];
+       Tile_type_t map[MAP_SIZE][MAP_SIZE];
    };
 
    // dynamic data
    Mvec_t monsters;
    
 } Floor_t;
+
+static inline int is_walkable(Floor_t* f, int x, int y) {
+    return f && tile_flags[f->map[y][x]] & TILE_WALKABLE;
+}
 
 #define FLOOR_STATIC_DATA_SIZE (sizeof(((Floor_t *)0)->map))
 
@@ -40,7 +45,8 @@ typedef union Sizes_of_floor_dynamic_data {
 // int main() {sizeof(Floor_t)}
 
 int floor_init_test_grid(Floor_t* f);
-int floor_printable_garbage_data(Floor_t* f);
+int floor_init_random_grid(Floor_t* f);
+int floor_generate_grid_v1(Floor_t* f);
 
 #define SAVEFILE "appdata/savefile_floor"
 int save_floor(Floor_t* floor, int index);
