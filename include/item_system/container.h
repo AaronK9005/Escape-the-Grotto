@@ -44,6 +44,8 @@ void container_destroy(Container_t* cont);
 
 int container_add(Container_t* cont, Slot_t* slot);
 
+int container_random_fill(Container_t* cont, int w, int h, int min_items, int max_items);
+
 void container_print(Container_t* cont, int cols, int selected_index);
 void slot_print(Slot_t* slot);
 

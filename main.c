@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "sys/util/ansi_wrappers.h"
+#include "game.h"
 
 #include "main_cleanup.inl"
 
@@ -43,19 +44,20 @@ int main()
 #endif
 
     srand(time(NULL));
-    init_game();
+    Game_t game_instance = { 0 };
+    Game_t* game = &game_instance;
+    init_game(game);
 
     ansi_clear_screen();
     ansi_hide_cursor();
     
-    while (!GET(GF_shouldClose)) {
-        input_char = get_input();
-        game_logic();
-        render();
+    while (!should_close(game)) {
+        game->input_char = get_input();
+        update_game(game);
+        render_game(game);
     }
 
-    free_game();
-    free_renderer(&renderer);
+    free_game(game);
     
     ansi_show_cursor();
 

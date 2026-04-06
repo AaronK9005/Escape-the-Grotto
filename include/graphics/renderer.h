@@ -27,7 +27,7 @@ typedef struct Renderer_t {
 
 // int main() {sizeof(Renderer_t);}
 
-#define EMPTY_RENDERER {NULL, NULL, 0}
+#define EMPTY_RENDERER (Renderer_t){NULL, NULL, 0}
 
 int init_renderer(Renderer_t* r, Camera_t* c);
 

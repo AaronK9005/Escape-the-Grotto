@@ -25,3 +25,17 @@ void delete_inventory(Inventory_t *i) {
         free(i);
     }
 }
+
+int inventory_random_fill(Inventory_t* i, int min, int max) {
+    if (min > max) {
+        int tmp = min;
+        min = max;
+        max = tmp;
+    }
+
+    if (min < 0) min = 0;
+    if (max < 0) max = 1;
+    if (max > i->cont->slot_count) max = i->cont->slot_count;
+
+    return container_random_fill(i->cont, i->cols, i->rows, min, max);
+}

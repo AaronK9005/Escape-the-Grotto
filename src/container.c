@@ -100,6 +100,34 @@ int container_add(Container_t* cont, Slot_t* slot) {
     return CONTAINER_RET_OK;
 }
 
+int container_random_fill(Container_t* cont, int w, int h, int min_items, int max_items) {
+    if (!cont || !cont->slot)
+        return CONTAINER_RET_FAIL;
+    if (w <= 0 || h <= 0)
+        return CONTAINER_RET_FAIL;
+    if ((size_t)w * (size_t)h != cont->slot_count)
+        return CONTAINER_RET_FAIL;
+    
+    int r = (rand() % (max_items - min_items + 1)) + min_items;
+    int placed = 0;
+
+    while (placed < r) {
+        int x = rand() % w;
+        int y = rand() % h;
+
+        if (cont->slot[y * w + x].stack.id == ITEM_NONE) {
+            int id = (rand() % (ITEM_COUNT - 1)) + 1;
+            int max_stack = item_max_stack[id];
+            int count = (rand() % max_stack) + 1;
+
+            cont->slot[y * w + x] = SLOT_NEW(id, count);
+            placed++;
+        }
+    }
+
+    return placed;
+}
+
 #pragma region (debug) printing
 int printf(const char*, ...);
 int putchar(int);
