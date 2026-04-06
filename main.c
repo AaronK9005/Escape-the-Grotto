@@ -6,10 +6,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include "sys/util/ansi_wrappers.h"
-#include "game.h"
 #include "input_map.h"
+#include "game.h"
 
-#include "graphics/pop_up_win.h"
+#include "graphics/modal.h"
 
 int main()
 {
@@ -45,6 +45,7 @@ int main()
 
     return 0;
 #endif
+
     Game_t game_instance = { 0 };
     Game_t* game = &game_instance;
 

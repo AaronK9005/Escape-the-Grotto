@@ -28,6 +28,8 @@ typedef struct Game_t {
     Slot_t cursor_slot;
     int cursor_idx;
     int input_char;
+
+    // graphics
     Camera_t player_cam;
     Renderer_t renderer;
 
@@ -58,16 +60,3 @@ void free_game(Game_t* game);
 
 int save_game(Game_t* game);
 int load_game(Game_t* game);
-
-/*
-extern Game_state_t game_state;
-extern int input_char;
-extern Game_flags_t flags;
-extern Game_data_t game_data;
-extern Camera_t player_cam;
-extern Renderer_t renderer;
-
-// INVENTORY
-extern Slot_t cursor_slot;
-extern int cursor_idx;
-*/

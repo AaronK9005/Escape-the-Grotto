@@ -212,8 +212,8 @@ void render_game(Game_t* game) {
                 game->player.pos.y - game->player_cam.height / 2
             };
 
-            game->player_cam.position.x = (short)iclamp(ncpos.x, 0, imax(MAP_SIZE - (game->player_cam.width + 1) / 2, 0));
-            game->player_cam.position.y = (short)iclamp(ncpos.y, 0, imax(MAP_SIZE - (game->player_cam.height + 1) / 2, 0));
+            game->player_cam.position.x = (short)iclamp(ncpos.x, 0, imax(MAP_SIZE - (game->player_cam.width), 0));
+            game->player_cam.position.y = (short)iclamp(ncpos.y, 0, imax(MAP_SIZE - (game->player_cam.height), 0));
         }
         render_floor(&game->renderer, &CURRENT_FLOOR(game));
         renderer_draw_char_pos(&game->renderer, PLAYER_CHAR, game->player.pos);
