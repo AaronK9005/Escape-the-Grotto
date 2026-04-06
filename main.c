@@ -1,10 +1,13 @@
+#if !defined(_WIN32) || !defined(_WIN64)
+    #error Compilation failed: Currently this game only supports Windows.
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include "sys/util/ansi_wrappers.h"
 #include "game.h"
-
-#include "main_cleanup.inl"
+#include "input_map.h"
 
 #include "graphics/pop_up_win.h"
 
@@ -42,17 +45,17 @@ int main()
 
     return 0;
 #endif
-
-    srand(time(NULL));
     Game_t game_instance = { 0 };
     Game_t* game = &game_instance;
+
+    srand(time(NULL));
     init_game(game);
 
     ansi_clear_screen();
     ansi_hide_cursor();
     
     while (!should_close(game)) {
-        game->input_char = get_input();
+        game_get_input(game);
         update_game(game);
         render_game(game);
     }

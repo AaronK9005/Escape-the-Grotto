@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <conio.h>
+#include <ctype.h>
 #include "game.h"
 #include "input_map.h"
 #include "sys/util/clamp.h"
@@ -24,6 +26,44 @@ void init_game(Game_t* game) {
     // test
     floor_init_test_grid(&CURRENT_FLOOR(game));
     inventory_random_fill(game->player.inventory, 3, 7);
+}
+
+void game_get_input(Game_t* game) {
+    if (!game) return;
+
+    #define ARROW_PREFIX 224
+    #define ARROW_UP 72
+    #define ARROW_LEFT 75
+    #define ARROW_RIGHT 77
+    #define ARROW_DOWN 80
+
+    if (_kbhit())
+    {
+        int input = tolower(_getch());
+        if (input == ARROW_PREFIX) {
+            switch (_getch())
+            {
+            case ARROW_UP:
+                game->input_char = INPUT_MOVE_UP;
+                break;
+            case ARROW_LEFT:
+                game->input_char = INPUT_MOVE_LEFT;
+                break;
+            case ARROW_RIGHT:
+                game->input_char = INPUT_MOVE_RIGHT;
+                break;
+            case ARROW_DOWN:
+                game->input_char = INPUT_MOVE_DOWN;
+                break;
+            default:
+                break;
+            }
+        }
+        else {
+            game->input_char = input;
+        }
+    }
+    else game->input_char = INPUT_NONE;
 }
 
 #pragma region separate handle_input_STATE functions

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "core.h"
+#include "sys/util/my_stdint.h"
+#include "player.h"
+#include "floor.h"
 #include "graphics/renderer.h"
 
 typedef enum {
@@ -49,6 +51,7 @@ static inline int should_close(Game_t* game) {
 }
 
 void init_game(Game_t* game);
+void game_get_input(Game_t* game);
 void update_game(Game_t* game);
 void render_game(Game_t* game);
 void free_game(Game_t* game);
