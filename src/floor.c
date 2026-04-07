@@ -128,18 +128,10 @@ int floor_generate_grid_v1(Floor_t* f) {
                     
         switch (dir)
         {
-        case 0: // up
-            y--;
-            break;
-        case 1: // down
-            y++;
-            break;
-        case 2: // left
-            x--;
-            break;
-        case 3: // right
-            x++;
-            break;
+        case 0: y--; break;
+        case 1: y++; break;
+        case 2: x--; break;
+        case 3: x++; break;
         }
 
         if (x < 0) x = 0;
@@ -157,7 +149,7 @@ int floor_generate_grid_v1(Floor_t* f) {
     x = 1;
     y = 1;
 
-    // squiggly line from "spawn" through the whole map
+    // squiggly line from "spawn" through the whole map with branch-offs
     const int end_x = 60;
     const int end_y = 60;
 
@@ -190,6 +182,44 @@ int floor_generate_grid_v1(Floor_t* f) {
                 int branch_dir = rand() % 6;
                 int branch_x = x;
                 int branch_y = y;
+                
+                /* // bot's version
+                int dx = 0, dy = 0;
+
+                switch (branch_dir) {
+                    case 0: dx = 0; dy = -1; break;
+                    case 1: dx = 1; dy = -1; break;
+                    case 2: dx = 1; dy = 0; break;
+                    case 3: dx = -1; dy = 0; break;
+                    case 4: dx = -1; dy = 1; break;
+                    case 5: dx = 0; dy = 1; break;
+                }
+
+                while (branch_len-- > 0)
+                {
+                    if (rand() % 100 < 40) {
+                        branch_dir = rand() % 6;
+                        switch (branch_dir) {
+                            case 0: dx = 0; dy = -1; break;
+                            case 1: dx = 1; dy = -1; break;
+                            case 2: dx = 1; dy = 0; break;
+                            case 3: dx = -1; dy = 0; break;
+                            case 4: dx = -1; dy = 1; break;
+                            case 5: dx = 0; dy = 1; break;
+                        }
+                    }
+
+                    branch_x += dx;
+                    branch_y += dy;
+
+                    if (branch_x <= 0 || branch_x >= MAP_SIZE-1 ||
+                        branch_y <= 0 || branch_y >= MAP_SIZE-1)
+                        break;
+
+                    f->map[branch_y][branch_x] = TILE_FLOOR;
+                }
+                */
+
 
                 while (branch_len-- > 0)
                 {
@@ -233,8 +263,7 @@ int floor_generate_grid_v1(Floor_t* f) {
                     else if (branch_y >= MAP_SIZE) branch_y = MAP_SIZE - 1;
 
                     f->map[branch_y][branch_x] = TILE_FLOOR;
-                }
-                
+                }                
             }
         }
 
