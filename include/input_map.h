@@ -12,5 +12,6 @@ typedef enum {
     INPUT_QUIT_PROGRAM = 'q',
     INPUT_TOGGLE_INVENTORY = 'i',
     INPUT_LEFT_CLICK = 'k',
-    INPUT_RIGHT_CLICK = 'l'
+    INPUT_RIGHT_CLICK = 'l',
+    INPUT_TOGGLE_DEBUG_CAM = 't'
 } Input_t;

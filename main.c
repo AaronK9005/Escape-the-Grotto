@@ -52,7 +52,7 @@ int main()
     srand(time(NULL));
     init_game(game);
 
-    ansi_clear_screen();
+    //ansi_clear_screen();
     ansi_hide_cursor();
     
     while (!should_close(game)) {

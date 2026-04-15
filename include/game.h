@@ -17,8 +17,9 @@ typedef enum Game_flags_t {
     GF_shouldClose = FLAG(1),
     GF_render = FLAG(2),
     GF_using_debug_cam = FLAG(3),
+    GF_clear_screen = FLAG(4),
 
-    GF_default = GF_render
+    GF_default = GF_render | GF_clear_screen
 } Game_flags_t;
 
 #define NUMBER_OF_FLOORS 5
@@ -46,9 +47,14 @@ typedef struct Game_t {
 #define PLAYER(g) ((g)->player)
 #define PLAYER_INV(g) ((g)->player.inventory->cont->slot)
 #define PLAYER_CAN_WALK(g, dx, dy) (is_walkable(&CURRENT_FLOOR(g), PLAYER(g).pos.x + (dx), PLAYER(g).pos.y + (dy)))
+#define CHANGE_STATE(game, state) (game)->game_state = (state); game->flags |= GF_render | GF_clear_screen
 
 static inline int should_render(Game_t* game) {
     return game && (game->flags & GF_render) != 0;
+}
+
+static inline int should_clrscr(Game_t* game) {
+    return game && (game->flags & GF_clear_screen) != 0;
 }
 
 static inline int should_close(Game_t* game) {

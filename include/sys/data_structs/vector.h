@@ -8,6 +8,8 @@
  * resolve usage func names
  */
 
+ #include <stddef.h>
+
 typedef struct std_cpp_vector {
     void* data;
     size_t member_size;

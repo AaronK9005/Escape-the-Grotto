@@ -5,14 +5,14 @@
 #include "input_map.h"
 #include "sys/util/clamp.h"
 #include "sys/util/ansi_wrappers.h"
+#include "state_funcs.h"
 
 void init_game(Game_t* game) {
     if (!game) return;
 
     game->game_state = GAMESTATE_PLAYING;
     game->flags = GF_default;
-    game->player_cam = //(Camera_t) { {1,1}, 32, 64}; // test camera
-                    (Camera_t){ {1,1}, DEFAULT_VISIBILITY, 2 * DEFAULT_VISIBILITY };
+    game->player_cam = (Camera_t){ {1,1}, DEFAULT_VISIBILITY, 2 * DEFAULT_VISIBILITY };
     game->debug_cam = (Camera_t) { {1,1}, 32, 64};
     // other fields are 0
 
@@ -62,134 +62,134 @@ void game_get_input(Game_t* game) {
     else game->input_char = INPUT_NONE;
 }
 
-#pragma region separate handle_input_STATE functions
-
-void handle_input_PLAYING(Game_t* game) {
-    switch (game->input_char) {
-        case INPUT_NONE: break;
-        case INPUT_QUIT_PROGRAM: game->flags |= GF_shouldClose; break;
-        case INPUT_MOVE_UP:
-            if ((game->player.pos.y > 0) && PLAYER_CAN_WALK(game, 0, -1)) {
-                game->player.pos.y--;
-                game->flags |= GF_render;
-            }
-            break;
-        case INPUT_MOVE_DOWN:
-            if ((game->player.pos.y < MAP_SIZE - 1) && PLAYER_CAN_WALK(game, 0, 1)) {
-                game->player.pos.y++;
-                game->flags |= GF_render;
-            }
-            break;
-        case INPUT_MOVE_LEFT:
-            if ((game->player.pos.x > 0) && PLAYER_CAN_WALK(game, -1, 0)) {
-                game->player.pos.x--;
-                game->flags |= GF_render;
-            }
-            break;
-        case INPUT_MOVE_RIGHT:
-            if ((game->player.pos.x < MAP_SIZE - 1) && PLAYER_CAN_WALK(game, 1, 0)) {
-                game->player.pos.x++;
-                game->flags |= GF_render;
-            }
-            break;
-        case INPUT_TOGGLE_INVENTORY:
-            game->game_state = GAMESTATE_INVENTORY;
-            ansi_clear_screen();
-            game->flags |= GF_render;
-            break;
-        case 't':
-            game->flags ^= GF_using_debug_cam;
-            if (game->flags & GF_using_debug_cam) {
-                if (renderer_change_cam(&game->renderer, &game->debug_cam) != 0)
-                    ansi_bg_red();
-                else
-                    ansi_reset();
-            }
-            else {
-                if (renderer_change_cam(&game->renderer, &game->player_cam) != 0)
-                    ansi_bg_blue();
-                else
-                    ansi_reset();
-            }
-            ansi_clear_screen();
-            game->flags |= GF_render;
-            break;
-    }
-}
-
-void handle_input_INVENTORY(Game_t* game) {
-    switch (game->input_char)
-    {
-        #define cols game->player.inventory->cols
-        #define rows game->player.inventory->rows
-
-    case INPUT_MOVE_UP: {
-        if(game->cursor_idx / cols > 0) {
-            game->cursor_idx -= cols;
-            game->flags |= GF_render;
-        }
-        break;
-    }
-    case INPUT_MOVE_DOWN: {
-        if(game->cursor_idx / cols < rows-1) {
-            game->cursor_idx += cols;
-            game->flags |= GF_render;
-        }
-        break;
-    }
-    case INPUT_MOVE_LEFT: {
-        if(game->cursor_idx % cols != 0) {
-            game->cursor_idx--;
-            game->flags |= GF_render;
-        }
-        break;
-    }
-    case INPUT_MOVE_RIGHT: {
-        if(game->cursor_idx % cols != cols-1) {
-            game->cursor_idx++;
-            game->flags |= GF_render;
-        }
-        break;
-    }
-    case INPUT_TOGGLE_INVENTORY: {
-        if (container_add(game->player.inventory->cont, &game->cursor_slot) != CONTAINER_RET_OK) {
-            // drop item
-        }
-        game->game_state = GAMESTATE_PLAYING;
-        ansi_clear_screen(); // because map rendering does not clear screen
-        game->flags |= GF_render; // to print after exiting inventory
-        break;
-    }
-    case INPUT_RIGHT_CLICK: {
-        if (game->cursor_slot.stack.id == ITEM_NONE || PLAYER_INV(game)[game->cursor_idx].stack.id == ITEM_NONE) {
-            slot_swap(&game->cursor_slot, &PLAYER_INV(game)[game->cursor_idx]);
-            game->flags |= GF_render;
-        }
-        else {
-            if (slot_merge(&game->cursor_slot, &PLAYER_INV(game)[game->cursor_idx]) != SLOT_RET_NOOP) game->flags |= GF_render;
-        }
-        break;
-    }
-    case INPUT_LEFT_CLICK: {
-        if (game->cursor_slot.stack.id == ITEM_NONE) {
-            if (slot_split(&PLAYER_INV(game)[game->cursor_idx], &game->cursor_slot) != SLOT_RET_NOOP) game->flags |= GF_render;
-            // fix: prints inventory when cursor is on empty slot
-        }
-        else if (PLAYER_INV(game)[game->cursor_idx].stack.id == ITEM_NONE ||
-                 PLAYER_INV(game)[game->cursor_idx].stack.id == game->cursor_slot.stack.id) {
-            game->flags |= GF_render;
-            PLAYER_INV(game)[game->cursor_idx] = SLOT_NEW(game->cursor_slot.stack.id, ++PLAYER_INV(game)[game->cursor_idx].stack.count);
-            game->cursor_slot.stack.count--;
-            if (game->cursor_slot.stack.count <= 0) slot_clear(&game->cursor_slot);
-        }
-        break;
-    }
-
-    default:
-        break;
-    }
-}
-#pragma endregion
+// #pragma region separate handle_input_STATE functions
+//
+// void handle_input_PLAYING(Game_t* game) {
+//     switch (game->input_char) {
+//         case INPUT_NONE: break;
+//         case INPUT_QUIT_PROGRAM: game->flags |= GF_shouldClose; break;
+//         case INPUT_MOVE_UP:
+//             if ((game->player.pos.y > 0) && PLAYER_CAN_WALK(game, 0, -1)) {
+//                 game->player.pos.y--;
+//                 game->flags |= GF_render;
+//             }
+//             break;
+//         case INPUT_MOVE_DOWN:
+//             if ((game->player.pos.y < MAP_SIZE - 1) && PLAYER_CAN_WALK(game, 0, 1)) {
+//                 game->player.pos.y++;
+//                 game->flags |= GF_render;
+//             }
+//             break;
+//         case INPUT_MOVE_LEFT:
+//             if ((game->player.pos.x > 0) && PLAYER_CAN_WALK(game, -1, 0)) {
+//                 game->player.pos.x--;
+//                 game->flags |= GF_render;
+//             }
+//             break;
+//         case INPUT_MOVE_RIGHT:
+//             if ((game->player.pos.x < MAP_SIZE - 1) && PLAYER_CAN_WALK(game, 1, 0)) {
+//                 game->player.pos.x++;
+//                 game->flags |= GF_render;
+//             }
+//             break;
+//         case INPUT_TOGGLE_INVENTORY:
+//             game->game_state = GAMESTATE_INVENTORY;
+//             ansi_clear_screen();
+//             game->flags |= GF_render;
+//             break;
+//         case INPUT_TOGGLE_DEBUG_CAM:
+//             game->flags ^= GF_using_debug_cam;
+//             if (game->flags & GF_using_debug_cam) {
+//                 if (renderer_change_cam(&game->renderer, &game->debug_cam) != 0)
+//                     ansi_bg_red();
+//                 else
+//                     ansi_reset();
+//             }
+//             else {
+//                 if (renderer_change_cam(&game->renderer, &game->player_cam) != 0)
+//                     ansi_bg_blue();
+//                 else
+//                     ansi_reset();
+//             }
+//             ansi_clear_screen();
+//             game->flags |= GF_render;
+//             break;
+//     }
+// }
+//
+// void handle_input_INVENTORY(Game_t* game) {
+//     switch (game->input_char)
+//     {
+//         #define cols game->player.inventory->cols
+//         #define rows game->player.inventory->rows
+//
+//     case INPUT_MOVE_UP: {
+//         if(game->cursor_idx / cols > 0) {
+//             game->cursor_idx -= cols;
+//             game->flags |= GF_render;
+//         }
+//         break;
+//     }
+//     case INPUT_MOVE_DOWN: {
+//         if(game->cursor_idx / cols < rows-1) {
+//             game->cursor_idx += cols;
+//             game->flags |= GF_render;
+//         }
+//         break;
+//     }
+//     case INPUT_MOVE_LEFT: {
+//         if(game->cursor_idx % cols != 0) {
+//             game->cursor_idx--;
+//             game->flags |= GF_render;
+//         }
+//         break;
+//     }
+//     case INPUT_MOVE_RIGHT: {
+//         if(game->cursor_idx % cols != cols-1) {
+//             game->cursor_idx++;
+//             game->flags |= GF_render;
+//         }
+//         break;
+//     }
+//     case INPUT_TOGGLE_INVENTORY: {
+//         if (container_add(game->player.inventory->cont, &game->cursor_slot) != CONTAINER_RET_OK) {
+//             // drop item
+//         }
+//         game->game_state = GAMESTATE_PLAYING;
+//         ansi_clear_screen(); // because map rendering does not clear screen
+//         game->flags |= GF_render; // to print after exiting inventory
+//         break;
+//     }
+//     case INPUT_RIGHT_CLICK: {
+//         if (game->cursor_slot.stack.id == ITEM_NONE || PLAYER_INV(game)[game->cursor_idx].stack.id == ITEM_NONE) {
+//             slot_swap(&game->cursor_slot, &PLAYER_INV(game)[game->cursor_idx]);
+//             game->flags |= GF_render;
+//         }
+//         else {
+//             if (slot_merge(&game->cursor_slot, &PLAYER_INV(game)[game->cursor_idx]) != SLOT_RET_NOOP) game->flags |= GF_render;
+//         }
+//         break;
+//     }
+//     case INPUT_LEFT_CLICK: {
+//         if (game->cursor_slot.stack.id == ITEM_NONE) {
+//             if (slot_split(&PLAYER_INV(game)[game->cursor_idx], &game->cursor_slot) != SLOT_RET_NOOP) game->flags |= GF_render;
+//             // fix: prints inventory when cursor is on empty slot
+//         }
+//         else if (PLAYER_INV(game)[game->cursor_idx].stack.id == ITEM_NONE ||
+//                  PLAYER_INV(game)[game->cursor_idx].stack.id == game->cursor_slot.stack.id) {
+//             game->flags |= GF_render;
+//             PLAYER_INV(game)[game->cursor_idx] = SLOT_NEW(game->cursor_slot.stack.id, ++PLAYER_INV(game)[game->cursor_idx].stack.count);
+//             game->cursor_slot.stack.count--;
+//             if (game->cursor_slot.stack.count <= 0) slot_clear(&game->cursor_slot);
+//         }
+//         break;
+//     }
+//
+//     default:
+//         break;
+//     }
+// }
+// #pragma endregion
 
 void update_game(Game_t* game) {
     if (!game) return;
@@ -210,7 +210,14 @@ void update_game(Game_t* game) {
 }
 
 void render_game(Game_t* game) {
-    if (!game || !should_render(game)) return;
+    if (!game) return;
+
+    if (should_clrscr(game)) {
+        game->flags &= ~GF_clear_screen;
+        ansi_clear_screen();
+    }
+
+    if (!should_render(game)) return;
 
     game->flags &= ~GF_render;
 
